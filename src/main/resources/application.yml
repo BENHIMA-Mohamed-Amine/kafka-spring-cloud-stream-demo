@@ -5,6 +5,8 @@ spring:
   application:
     name: kafka-demo
   cloud:
+    function:
+      definition: consumer;supplier;analytics
     stream:
       kafka:
         binder:
@@ -23,16 +25,10 @@ spring:
         supplier-out-0:
           destination: data-stream
 
-        # Stream Processor Input
-        processor-in-0:
+        # Analytics Consumer
+        analytics-in-0:
           destination: data-stream
+          group: analytics-group
 
-        # Stream Processor Output
-        processor-out-0:
-          destination: analytics
-
-      function:
-        definition: consumer;supplier;processor
-
-    function:
-      definition: consumer;supplier;processor
+      poller:
+        fixed-delay: 2000
