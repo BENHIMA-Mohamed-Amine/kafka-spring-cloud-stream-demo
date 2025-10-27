@@ -1,0 +1,38 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: kafka-demo
+  cloud:
+    stream:
+      kafka:
+        binder:
+          brokers: localhost:9092
+      bindings:
+        # Producer
+        producer-out-0:
+          destination: events
+
+        # Consumer
+        consumer-in-0:
+          destination: events
+          group: consumer-group
+
+        # Supplier
+        supplier-out-0:
+          destination: data-stream
+
+        # Stream Processor Input
+        processor-in-0:
+          destination: data-stream
+
+        # Stream Processor Output
+        processor-out-0:
+          destination: analytics
+
+      function:
+        definition: consumer;supplier;processor
+
+    function:
+      definition: consumer;supplier;processor
