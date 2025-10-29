@@ -4,7 +4,7 @@ Real-time event streaming and analytics application using Apache Kafka and Sprin
 
 ## Demo Video
 
-🎥 **[Watch Demo Video](ressources/tp1-kafka-streams-demo.webm)**
+🎥 **[Watch Demo Video](ressources/tp1-kafka-streams-demo.mp4)**
 
 ---
 
