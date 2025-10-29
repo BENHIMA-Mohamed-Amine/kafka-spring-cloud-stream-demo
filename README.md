@@ -1,126 +1,118 @@
 # Kafka Spring Cloud Stream Demo
 
-Real-time event streaming and data analytics using Apache Kafka and Spring Cloud Stream.
+Real-time event streaming and analytics application using Apache Kafka and Spring Cloud Stream.
+
+## Demo Video
+
+🎥 **[Watch Demo Video](#)** *(ressources/tp1-kafka-streams-demo.webm)*
+
+---
 
 ## Project Structure
 ```
 src/main/java/ma/enset/javakafka/
-├── JavaKafkaApplication.java       # Main Spring Boot application
+├── JavaKafkaApplication.java           # Main application entry point
 ├── controller/
-│   └── ProducerController.java     # REST API to publish events
+│   ├── ProducerController.java         # POST /api/events - Manual event publishing
+│   └── AnalyticsController.java        # GET /api/analytics/page-views - Analytics data
 ├── service/
-│   └── ConsumerService.java        # Consumes Kafka messages
+│   ├── ConsumerService.java            # Consumes and logs events from 'events' topic
+│   ├── SupplierService.java            # Auto-generates PageEvents every 2 seconds
+│   └── AnalyticsService.java           # Real-time analytics - counts page views
 ├── model/
-│   └── Event.java                  # Event data model
-└── config/                         # Configuration classes (future)
+│   ├── Event.java                      # Basic event model
+│   └── PageEvent.java                  # User activity model (userId, page, action, duration)
+└── resources/
+    ├── application.yml                 # Kafka and Spring Cloud Stream configuration
+    └── static/index.html               # Live analytics dashboard with bar chart
 ```
 
-### Components
+---
 
-- **Producer Service**: REST Controller (`/api/events`) to publish events to Kafka
-- **Consumer Service**: Consumes and processes messages from Kafka topics
-- **Supplier Service**: Auto-generates data streams (planned)
-- **Stream Processor**: Real-time analytics with Kafka Streams (planned)
-- **Web Dashboard**: Live data visualization (planned)
+## Components
+
+| Component | Description |
+|-----------|-------------|
+| **ProducerController** | REST API to manually send events to Kafka |
+| **ConsumerService** | Listens to `events` topic and logs messages |
+| **SupplierService** | Automatically generates random PageEvents every 2 seconds |
+| **AnalyticsService** | Processes data stream and counts page views by page |
+| **AnalyticsController** | Exposes analytics data as JSON for dashboard |
+| **Dashboard** | Live visualization with auto-updating bar chart |
+
+---
 
 ## Technologies
 
-- Apache Kafka 4.1.0 (KRaft mode - no ZooKeeper)
-- Spring Boot 3.x
-- Spring Cloud Stream
-- Docker & Docker Compose
-- Lombok
-- Maven
+- **Apache Kafka 4.1.0** (KRaft mode)
+- **Spring Boot 3.5.7**
+- **Spring Cloud Stream 4.3.0**
+- **Docker & Docker Compose**
+- **Maven + Lombok**
 
-## Setup
+---
 
-### Part 1: Local Kafka (KRaft Mode)
+## Quick Start
 ```bash
-# Generate Cluster UUID
-KAFKA_CLUSTER_ID="$(bin/kafka-storage.sh random-uuid)"
-
-# Format storage
-bin/kafka-storage.sh format --standalone -t $KAFKA_CLUSTER_ID -c config/server.properties
-
-# Start Kafka
-bin/kafka-server-start.sh config/server.properties
-```
-
-### Part 2: Docker (Recommended)
-```bash
-# Start Kafka broker
+# 1. Start Kafka
 docker compose up -d
 
-# Verify running
-docker compose ps
-
-# View logs
-docker compose logs -f broker
-
-# Stop
-docker compose down
-```
-
-### Part 3: Run Spring Boot Application
-```bash
-# Start application
+# 2. Start Spring Boot application
 mvn spring-boot:run
 
-# Or run in IntelliJ: Click green play button
+# 3. Open dashboard
+http://localhost:8080
 ```
 
-## Usage
-
-### Send Event via REST API
-```bash
-curl -X POST http://localhost:8080/api/events \
-  -H "Content-Type: application/json" \
-  -d "Hello from Kafka Producer!"
-```
-
-### Test with Kafka Console Tools
-
-**Producer:**
-```bash
-docker exec -it kafka-broker /opt/kafka/bin/kafka-console-producer.sh \
-  --topic events --bootstrap-server localhost:9092
-```
-
-**Consumer:**
-```bash
-docker exec -it kafka-broker /opt/kafka/bin/kafka-console-consumer.sh \
-  --topic events --from-beginning --bootstrap-server localhost:9092
-```
+---
 
 ## Kafka Topics
 
-- `events` - Producer/Consumer events
-- `data-stream` - Supplier auto-generated data
-- `analytics` - Stream processing results
+- **events** - Producer/Consumer communication
+- **data-stream** - Auto-generated PageEvents → Analytics processing
 
-## Results
+---
 
-### Producer Sending Event
-![Producer Result](images/img.png)
+## Usage
 
-### Consumer Receiving Event
-![Consumer Result](images/img_1.png)
+### View Live Dashboard
+```
+http://localhost:8080
+```
+Displays real-time bar chart of page views (updates every 2 seconds)
 
-## Configuration
-
-Key settings in `application.yml`:
-- Kafka broker: `localhost:9092`
-- Server port: `8080`
-- Topics: `events`, `data-stream`, `analytics`
+---
 
 ## Architecture
 ```
-REST API (Producer) → Kafka Topic (events) → Consumer Service
-                          ↓
-                    Spring Cloud Stream
-                          ↓
-                   Kafka Streams (future)
+┌──────────────────┐      ┌─────────────┐      ┌─────────────────┐
+│ ProducerController│─────▶│Kafka: events│─────▶│ ConsumerService │
+│   (REST API)     │      └─────────────┘      │  (logs events)  │
+└──────────────────┘                            └─────────────────┘
+
+┌──────────────────┐      ┌──────────────┐      ┌──────────────────┐
+│ SupplierService  │─────▶│Kafka: data-  │─────▶│ AnalyticsService │
+│ (auto-gen every  │      │    stream    │      │ (count views)    │
+│    2 seconds)    │      └──────────────┘      └────────┬─────────┘
+└──────────────────┘                                     │
+                                                         ▼
+                                             ┌─────────────────────┐
+                                             │  Web Dashboard      │
+                                             │  (live bar chart)   │
+                                             └─────────────────────┘
 ```
+
+---
+
+## Features
+
+✅ REST API for manual event publishing  
+✅ Auto-generated data stream  
+✅ Real-time data analytics  
+✅ Live web dashboard with visualization  
+✅ Docker-based Kafka setup
+
+---
 
 ## License
 
